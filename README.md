@@ -6,18 +6,41 @@
 
 * [index](index.html) contains the login form
 * [dashboard](dashboard.html) contains the app itself
+* [access](access.html) contains calendaring widget - **in progress**
+
 
 ###Completed
 
-* You are able to log in
-* You are able to register
-* Dashboard checks if user is logged in - else redirects to index
+* You are able to log in & log out
+* You are able to register & log in simultaneusly
+* Redirects: 
+	* Dashboard checks if user is logged in - else redirects to index
+	* Index redirects to dashboard if already logged in
+* app writing to Firebase
+	* current JSON tree looks like: 
+	
+```
+grasplock: {
+	users: {
+		user1: {
+			lock: true
+		},
+		user2: {
+			lock: true
+		},
+		user3: {
+			lock: true
+		},
+		...
+}
+```
+
+> When a user registers, they get assigned a key value pair of {lock: true} for testing purposes. See [here](index.html#L301).
 
 
 ###To-Do
-
-* Writing / reading data to Firebase
-* Add additional pages for each icon maybe? 
+* Reading data from Firebase
+* Add additional pages for each icon
 
 
 ###Attribution:
