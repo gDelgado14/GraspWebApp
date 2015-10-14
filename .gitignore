@@ -7,3 +7,7 @@ firebase.json
 css/**
 fonts/**
 js/**
+
+# bower stuff
+bower.json
+bower_components

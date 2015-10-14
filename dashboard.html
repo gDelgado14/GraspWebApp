@@ -15,16 +15,16 @@
     <!-- Firebase Library -->
 	<script src="https://cdn.firebase.com/js/client/2.2.9/firebase.js"></script>
 	
-	<script type="text/javascript">
-		    var ref = new Firebase("https://grasplock.firebaseio.com");
-			var authData = ref.getAuth();
-			
-			if (authData) {
-				console.log("Authenticated user with uid:", authData.uid);
-				console.log("user data", authData);
-    		}else {
-	    		window.location.href = "/";
-    		}
+	<script type="text/javascript">		
+	    var ref = new Firebase("https://grasplock.firebaseio.com");
+		var authData = ref.getAuth();
+		
+		if (authData) {
+			console.log("Authenticated user with uid:", authData.uid);
+			console.log("user data", authData);
+		}else {
+    		window.location.href = "/";
+		}
 	</script>
     
     <!-- Bootstrap Core CSS -->
