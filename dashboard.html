@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+	
+	
+    <title>GraspLock</title>
+    
+    <!-- Firebase Library -->
+	<script src="https://cdn.firebase.com/js/client/2.2.9/firebase.js"></script>
+	
+	<script type="text/javascript">		
+	    var ref = new Firebase("https://grasplock.firebaseio.com");
+		var authData = ref.getAuth();
+		
+		if (authData) {
+			console.log("Authenticated user with uid:", authData.uid);
+			console.log("user data", authData);
+		}else {
+    		window.location.href = "/";
+		}
+	</script>
+    
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+   
+    <!-- Custom CSS -->
+    <style>
+	    body {
+	        padding-top: 70px;
+	        /* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
+	        background: -webkit-linear-gradient(#059AFF, #085FE8); /* For Safari 5.1 to 6.0 */
+			background: -o-linear-gradient(#059AFF, #085FE8); /* For Opera 11.1 to 12.0 */
+			background: -moz-linear-gradient(#059AFF, #085FE8); /* For Firefox 3.6 to 15 */
+			background: linear-gradient(#059AFF, #085FE8) no-repeat center center fixed; /* Standard syntax (must be last) */
+			 
+			-webkit-background-size: cover;
+			   -moz-background-size: cover;
+			     -o-background-size: cover;
+				    background-size: cover;
+				    
+		}
+		
+		#main-menu {
+			margin-top: 200px;
+		}
+		
+		.glyphicon {
+			color: #fff;
+			font-size: 40px;
+		}
+		
+		.menu h4 {
+			color: #fff;
+		}
+		
+		.menu a h4:hover {
+			text-decoration: none;
+		}
+		
+		.btn-danger {
+			margin: 10px auto;
+		}
+    </style>
+	    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+	
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Grasp</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#aboutModal">About</a>
+                    </li>
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#contactModal">Contact</a>
+                    </li>
+                </ul>
+                <a href="#" class="btn btn-danger" onclick="logOut()">Log Out</a>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Content -->
+    
+    <div class="container">
+	    
+	    <div id="main-menu" class="row">
+		    
+		    <div class="menu col-md-2 col-md-offset-1 text-center">
+		        <a href="#">
+					<span class="glyphicon glyphicon-lock" aria-hidden="true"></span>
+					<h4>Unlock</h4>
+				</a>
+		    </div>
+			
+			<div class="menu col-md-2 text-center">
+				<a href="#">
+					<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+					<h4>Share</h4>
+				</a>
+			</div>
+			
+			<div class="menu col-md-2 text-center">
+				<a href="#">
+					<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+					<h4>Manage</h4>
+				</a>
+			</div>
+			
+			<div class="menu col-md-2 text-center">
+				<a href="/access.html">
+					<span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+					<h4>Give Access</h4>
+				</a>
+			</div>
+			
+			<div class="menu col-md-2 text-center">
+				<a href="#">
+					<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+					<h4>Add / Remove</h4>
+				</a>
+			</div>
+			
+	    </div> <!-- /.row -->
+	    
+	    
+	    <div id="aboutModal" class="modal fade">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					
+				  <div class="modal-header">
+				    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				    <h4 class="modal-title">About Us</h4>
+				  </div>
+				  
+				  <div class="modal-body">
+				    <p>We are avid cyclists, and we know the hassle of securing a bike. That's why we created Grasp; A fast, easy way to lock your bike, without compromising anything.</p>
+				  </div>
+				  <div class="modal-footer">
+				    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				  </div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+		
+		<div id="contactModal" class="modal fade">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					
+				  <div class="modal-header">
+				    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				    <h4 class="modal-title">Contact Us</h4>
+				  </div>
+				  
+				  <div class="modal-body">
+				    <form>
+					  <div class="form-group">
+					    <label for="contactName">Name</label>
+					    <input type="email" class="form-control" id="contactName" placeholder="Name">
+					  </div>
+					  <div class="form-group">
+					    <label for="contactEmail">Email address</label>
+					    <input type="email" class="form-control" id="contactEmail" placeholder="Email">
+					  </div>
+					  <div class="form-group">
+					    <label for="contactMsg">Message</label>
+					    <textarea id="contactMsg" class="form-control" placeholder="Message" rows="3"></textarea>
+					  </div>
+					
+					  <button type="submit" class="btn btn-success">Submit</button>
+					</form>
+				  </div>
+				  
+				  <div class="modal-footer">
+				    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				  </div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+	    
+    </div> <!-- /.container -->
+
+    <!-- jQuery Version 1.11.1 -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+    
+    <script type="text/javascript">
+	    
+	    function logOut() {
+		    ref.unauth();
+		    window.location.href = "/";
+	    }
+    </script>
+
+</body>
+
+</html>
+

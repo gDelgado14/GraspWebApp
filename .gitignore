@@ -1,0 +1,13 @@
+# removed for security purposes
+firebase.json
+
+.DS_Store
+
+# removed bootstrap libs
+css/**
+fonts/**
+js/**
+
+# bower stuff
+bower.json
+bower_components

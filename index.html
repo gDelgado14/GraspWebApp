@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>GraspLock</title>
+    
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+    body {
+        padding-top: 70px;
+        /* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
+    }
+    </style>
+	
+	<!-- Firebase Library -->
+	<script src="https://cdn.firebase.com/js/client/2.2.9/firebase.js"></script>
+	
+	<script type="text/javascript">
+		    var dataRef = new Firebase("https://grasplock.firebaseio.com");
+			var authData = dataRef.getAuth();
+			
+			if (authData) {
+				window.location.href = "/dashboard.html";
+    		}
+	</script>
+	    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Grasp</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#aboutModal">About</a>
+                    </li>
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#contactModal">Contact</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Content -->
+    
+    <div class="container">    
+        <div id="loginbox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">                    
+            <div class="panel panel-info" >
+                    <div class="panel-heading">
+                        <div class="panel-title">Sign In</div>
+                        <div style="float:right; font-size: 80%; position: relative; top:-10px"><a href="#">Forgot password?</a></div>
+                    </div>     
+
+                    <div style="padding-top:30px" class="panel-body" >
+
+                        <div style="display:none" id="login-alert" class="alert alert-danger col-sm-12"></div>
+                            
+                        <form id="loginform" class="form-horizontal" role="form">
+                            
+                            <div id="signupalert" style="display:none" class="alert alert-danger">
+                                    <p>Error:</p>
+                                    <span>wrong email, or password</span>
+                                </div>
+                                
+                            <div style="margin-bottom: 25px" class="input-group">
+                                        <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                        <input id="login-email" type="email" class="form-control" name="email" value="" placeholder="email">                                        
+                                    </div>
+                                
+                            <div style="margin-bottom: 25px" class="input-group">
+                                        <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                                        <input id="login-password" type="password" class="form-control" name="password" placeholder="password">
+                                    </div>
+                                    
+
+                                
+                            <div class="input-group">
+                                      <div class="checkbox">
+                                        <label>
+                                          <input id="login-remember" type="checkbox" name="remember" value="1"> Remember me
+                                        </label>
+                                      </div>
+                                    </div>
+
+
+                                <div style="margin-top:10px" class="form-group">
+                                    
+                                    <!-- Button -->
+                                    <div class="col-sm-12 controls">
+                                      <a id="btn-login" href="#" class="btn btn-success" onclick="logIn()">Login  </a>
+                                      <a id="btn-fblogin" href="#" class="btn btn-primary" disabled="disabled">Login with Facebook</a>
+
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <div class="col-md-12 control">
+                                        <div style="border-top: 1px solid#888; padding-top:15px; font-size:85%" >
+                                            Don't have an account! 
+                                        <a href="#" onClick="$('#loginbox').hide(); $('#signupbox').show()">
+                                            Sign Up Here
+                                        </a>
+                                        </div>
+                                    </div>
+                                </div>    
+                            </form>     
+
+ 
+
+                        </div>                     
+                    </div>  
+        </div>
+        
+        <div id="signupbox" style="display:none; margin-top:50px" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+                    
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <div class="panel-title">Sign Up</div>
+                    <div style="float:right; font-size: 85%; position: relative; top:-10px">
+                        <a id="signinlink" href="#" onclick="$('#signupbox').hide(); $('#loginbox').show()">Sign In</a>
+                    </div>
+                </div>  
+                <div class="panel-body" >
+                    <form id="signupform" class="form-horizontal" role="form">
+                        
+                        <div id="signupalert" style="display:none" class="alert alert-danger">
+                            <p>Error:</p>
+                            <span></span>
+                        </div>
+                            
+                          
+                        <div class="form-group">
+                            <label for="email" class="col-md-3 control-label">Email</label>
+                            <div class="col-md-9">
+                                <input id="registrationEmail" type="email" class="form-control" name="email" placeholder="Email Address">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="username" class="col-md-3 control-label">Username</label>
+                            <div class="col-md-9">
+                                <input id="registrationUsername" type="text" class="form-control" name="username" placeholder="Username">
+                            </div>
+                        </div>
+                            
+                        <div class="form-group">
+                            <label for="password" class="col-md-3 control-label">Password</label>
+                            <div class="col-md-9">
+                                <input id="registrationPass" type="password" class="form-control" name="passwd" placeholder="Password">
+                            </div>
+                        </div>
+                            
+
+                        <div class="form-group">
+                            <!-- Button -->                                        
+                            <div class="col-md-offset-3 col-md-9">
+                                <button id="btn-signup" type="button" class="btn btn-info" onclick="signUp()"><i class="icon-hand-right"></i> &nbsp Sign Up</button>
+                                <span style="margin-left:8px;">or</span>  
+                            </div>
+                        </div>
+                        
+                        <div style="border-top: 1px solid #999; padding-top:20px"  class="form-group">
+                            
+                            <div class="col-md-offset-3 col-md-9">
+                                <button id="btn-fbsignup" type="button" class="btn btn-primary" disabled="disabled"><i class="icon-facebook"></i>   Sign Up with Facebook</button>
+                            </div>                                           
+                                
+                        </div>
+                        
+                        
+                        
+                    </form>
+                 </div>
+            </div>
+     
+         </div> <! --/.signupbox -->
+         
+		<div id="aboutModal" class="modal fade">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					
+				  <div class="modal-header">
+				    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				    <h4 class="modal-title">About Us</h4>
+				  </div>
+				  
+				  <div class="modal-body">
+				    <p>We are avid cyclists, and we know the hassle of securing a bike. That's why we created Grasp; A fast, easy way to lock your bike, without compromising anything.</p>
+				  </div>
+				  <div class="modal-footer">
+				    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				  </div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+		
+		<div id="contactModal" class="modal fade">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					
+				  <div class="modal-header">
+				    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				    <h4 class="modal-title">Contact Us</h4>
+				  </div>
+				  
+				  <div class="modal-body">
+				    <form>
+					  <div class="form-group">
+					    <label for="contactName">Name</label>
+					    <input type="email" class="form-control" id="contactName" placeholder="Name">
+					  </div>
+					  <div class="form-group">
+					    <label for="contactEmail">Email address</label>
+					    <input type="email" class="form-control" id="contactEmail" placeholder="Email">
+					  </div>
+					  <div class="form-group">
+					    <label for="contactMsg">Message</label>
+					    <textarea id="contactMsg" class="form-control" placeholder="Message" rows="3"></textarea>
+					  </div>
+					
+					  <button type="submit" class="btn btn-success">Submit</button>
+					</form>
+				  </div>
+				  
+				  <div class="modal-footer">
+				    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				  </div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+		
+		
+    </div> <!-- /.container -->
+
+    <!-- jQuery Version 1.11.1 -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+    
+    <script type="text/javascript">
+		
+		var dataRef = new Firebase("https://grasplock.firebaseio.com");
+		
+		function signUp() {
+			
+			var signupEmail = $("#registrationEmail").val();
+			var userName =    $("#registrationUsername").val(); // userName can't contain ".", "#", "$", "/", "[", or "]" to turn to key
+			var signupPass =  $("#registrationPass").val();
+		
+	    
+			dataRef.createUser({
+				email:    signupEmail,
+				password: signupPass
+	    		}, function(error, userData) {
+			
+				if (error) {
+	        		console.log("Error creating user:", error);
+	      		} else {
+	        		console.log("Successfully created user account with uid:", userData.uid);
+	        		
+	        		var usersRef = dataRef.child("users");
+	        		
+	        		// create reference of user in table
+					// Keys must be non-empty strings and can't contain ".", "#", "$", "/", "[", or "]"
+	        		var userInfo = {};
+	        		userInfo[userName] = {
+		        		lock: true
+		        	};
+	        		usersRef.update(userInfo);
+					
+					// log user in once user successfully created
+					dataRef.authWithPassword({
+						email:    signupEmail,
+						password: signupPass
+					}, function(error, userData) {
+						if (error) {
+							console.log("Error logging in: ", error);
+							$('#signupalert').show();
+	      				} else {
+	        				console.log("Successfully logged in with: ", userData.uid);
+							window.location.href = "/dashboard.html";
+	      				}
+					});
+	      		}
+    		});
+		}
+		
+		function logIn() {
+			
+			var graspEmail = $("#login-email").val();
+			var graspP = $("#login-password").val();
+			
+			dataRef.authWithPassword({
+				email    : graspEmail,
+				password : graspP
+			}, function(error, userData) {
+				if (error) {
+	        		console.log("Error logging in: ", error);
+	        		$('#signupalert').show();
+	      		} else {
+	        		console.log("Successfully logged in with: ", userData.uid);
+	        		window.location.href = "/dashboard.html";
+	      		}
+			});
+		}
+		
+		
+		
+    </script>
+
+</body>
+
+</html>
