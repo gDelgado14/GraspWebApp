@@ -90,30 +90,30 @@
                             
                         <form id="loginform" class="form-horizontal" role="form">
                             
-                            <div id="signupalert" style="display:none" class="alert alert-danger">
-                                    <p>Error:</p>
-                                    <span>wrong email, or password</span>
-                                </div>
+                            <div id="signInalert" style="display:none" class="alert alert-danger">
+                                <p>Error:</p>
+                                <span>wrong email, or password</span>
+                            </div>
                                 
                             <div style="margin-bottom: 25px" class="input-group">
-                                        <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                                        <input id="login-email" type="email" class="form-control" name="email" value="" placeholder="email">                                        
-                                    </div>
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                <input id="login-email" type="email" class="form-control" name="email" value="" placeholder="email">                                        
+                            </div>
                                 
                             <div style="margin-bottom: 25px" class="input-group">
-                                        <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                                        <input id="login-password" type="password" class="form-control" name="password" placeholder="password">
-                                    </div>
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                                <input id="login-password" type="password" class="form-control" name="password" placeholder="password">
+                            </div>
                                     
 
                                 
                             <div class="input-group">
-                                      <div class="checkbox">
-                                        <label>
-                                          <input id="login-remember" type="checkbox" name="remember" value="1"> Remember me
-                                        </label>
-                                      </div>
-                                    </div>
+                            	<div class="checkbox">
+                                	<label>
+										<input id="login-remember" type="checkbox" name="remember" value="1"> Remember me
+										</label>
+                            	</div>
+                            </div>
 
 
                                 <div style="margin-top:10px" class="form-group">
@@ -157,9 +157,8 @@
                 <div class="panel-body" >
                     <form id="signupform" class="form-horizontal" role="form">
                         
-                        <div id="signupalert" style="display:none" class="alert alert-danger">
-                            <p>Error:</p>
-                            <span></span>
+                        <div id="signUpAlert" style="display:none" class="alert alert-danger">
+                            <p id="error-text"></p>
                         </div>
                             
                           
@@ -274,43 +273,60 @@
     
     <script type="text/javascript">
 		
-		var dataRef = new Firebase("https://grasplock.firebaseio.com");
-		
 		function signUp() {
 			
-			var signupEmail = $("#registrationEmail").val();
-			var userName =    $("#registrationUsername").val(); // userName can't contain ".", "#", "$", "/", "[", or "]" to turn to key
-			var signupPass =  $("#registrationPass").val();
-		
-	    
+			var uname = $("#registrationUsername").val();
+			
 			dataRef.createUser({
-				email:    signupEmail,
-				password: signupPass
+				email:    $("#registrationEmail").val(),
+				password: $("#registrationPass").val()
 	    		}, function(error, userData) {
 			
 				if (error) {
 	        		console.log("Error creating user:", error);
+	        		$("#error-text").text(error);
+	        		$('#signUpAlert').show();
+	        		
 	      		} else {
 	        		console.log("Successfully created user account with uid:", userData.uid);
 	        		
 	        		var usersRef = dataRef.child("users");
-	        		
 	        		// create reference of user in table
 					// Keys must be non-empty strings and can't contain ".", "#", "$", "/", "[", or "]"
 	        		var userInfo = {};
-	        		userInfo[userName] = {
-		        		lock: true
+	        		userInfo[userData.uid] = {
+		        		lock: true,
+		        		username: $("#registrationUsername").val(),
+		        		email: $("#registrationEmail").val()
 		        	};
 	        		usersRef.update(userInfo);
+	        		
+	        		
+	        		
+	        		var accessRef = dataRef.child("access");
+	        		var usernames = {};
+	        		
+	        		// Keys must be non-empty strings and can't contain ".", "#", "$", "/", "[", or "]"
+	        		usernames[uname] = {
+		        		locks: ["hahahaha", 1234324]
+					};
+					
+					alert(usernames);
+					
+					accessRef.update(usernames, function(error) {
+						if (error) {
+							console.log("error with data: ", usernames[$("#registrationUsername").val()]);
+						}
+					});
 					
 					// log user in once user successfully created
 					dataRef.authWithPassword({
-						email:    signupEmail,
-						password: signupPass
+						email:    $("#registrationEmail").val(),
+						password: $("#registrationPass").val()
 					}, function(error, userData) {
 						if (error) {
 							console.log("Error logging in: ", error);
-							$('#signupalert').show();
+							$('#signInalert').show();
 	      				} else {
 	        				console.log("Successfully logged in with: ", userData.uid);
 							window.location.href = "/dashboard.html";
@@ -331,7 +347,7 @@
 			}, function(error, userData) {
 				if (error) {
 	        		console.log("Error logging in: ", error);
-	        		$('#signupalert').show();
+	        		$('#signInalert').show();
 	      		} else {
 	        		console.log("Successfully logged in with: ", userData.uid);
 	        		window.location.href = "/dashboard.html";

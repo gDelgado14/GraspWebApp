@@ -102,6 +102,9 @@
                     <li>
                         <a href="#" data-toggle="modal" data-target="#contactModal">Contact</a>
                     </li>
+                    <li>
+                    	<a href="#" id="username"></a>
+                    </li>
                 </ul>
                 <a href="#" class="btn btn-danger" onclick="logOut()">Log Out</a>
             </div>
@@ -217,6 +220,10 @@
     <script src="js/bootstrap.min.js"></script>
     
     <script type="text/javascript">
+	    
+	    var username = ref.child("users/" + authData.uid + "/username").once("value", function(snapshot) {
+		    $("#username").append("Hello, " + snapshot.val());
+	    });
 	    
 	    function logOut() {
 		    ref.unauth();
