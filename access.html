@@ -16,20 +16,17 @@
 	<script src="https://cdn.firebase.com/js/client/2.2.9/firebase.js"></script>
 	
 	<script type="text/javascript">
-	    /*var ref = new Firebase("https://grasplock.firebaseio.com");
+	    var ref = new Firebase("https://grasplock.firebaseio.com");
 		var authData = ref.getAuth();
+		
 		
 		if (authData) {
 			console.log("Authenticated user with uid:", authData.uid);
 			console.log("user data", authData);
 		}else {
     		window.location.href = "/";
-		}*/
+		}
 	</script>
-    
-    <!-- jQuery Version 1.11.1 
-    <script src="js/jquery.js"></script>-->
-    
     
     <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
     
@@ -88,6 +85,10 @@
 			margin-bottom: 40px;
 		}
 		
+		#access-submit {
+			margin-top: 20px;
+		}
+		
     </style>
 	    
 	
@@ -133,47 +134,56 @@
 			<h2 id="title">Time Picker</h2>    
 	    </div>
 	    
+	    <div class="row">
+		    <div style="display:none" id="access-alert" class="alert col-sm-4 col-sm-offset-4 text-center">
+			    <p id="alert-text"></p>
+		    </div>
+	    </div>
 	    
-    	<div class="row">
+    	<div class="row text-center">
 	    	
-		    	<div class="form-inline">
-			    	
-			    	<div class="col-md-4 form-group">
-			    		<label for="username">Username</label>
-			    		<div class="input-group">
-				    		<input type="text" class="form-control" id="username" placeholder="Username ..."/>
-				    		<span class="input-group-addon">
-				    			<span class="glyphicon glyphicon-user"></span>
-			    		</span>
-			    		</div>
-			    	</div>
-			    	
-					<div class='col-md-4'>
-				        <div class="form-group">
-				            <div class='input-group date' id='datetimepicker6'>
-				                <input type='text' class="form-control" />
-				                <span class="input-group-addon">
-				                    <span class="glyphicon glyphicon-calendar"></span>
-				                </span>
-				            </div>
-				        </div>
-				    </div>
-				    
-				    <div class='col-md-4'>
-				        <div class="form-group">
-				            <div class='input-group date' id='datetimepicker7'>
-				                <input type='text' class="form-control" />
-				                <span class="input-group-addon">
-				                    <span class="glyphicon glyphicon-calendar"></span>
-				                </span>
-				            </div>
-				        </div>
-				    </div>
-		            
-		    	</div>  
+	    	<div class="form-inline">
+		    	
+		    	<div class="col-md-4 form-group">
+		    		<div class="input-group">
+			    		<input type="text" class="form-control" id="username" placeholder="Username ..."/>
+			    		<span class="input-group-addon">
+			    			<span class="glyphicon glyphicon-user"></span>
+		    		</span>
+		    		</div>
+		    	</div>
+		    	
+				<div class='col-md-4'>
+			        <div class="form-group">
+			            <div class='input-group date' id='datetimepicker6'>
+			                <input type='text' id="from" class="form-control" placeholder="From ... "/>
+			                <span class="input-group-addon">
+			                    <span class="glyphicon glyphicon-calendar"></span>
+			                </span>
+			            </div>
+			        </div>
+			    </div>
+			    
+			    <div class='col-md-4'>
+			        <div class="form-group">
+			            <div class='input-group date' id='datetimepicker7'>
+			                <input type='text' id="to" class="form-control" placeholder="To ... "/>
+			                <span class="input-group-addon">
+			                    <span class="glyphicon glyphicon-calendar"></span>
+			                </span>
+			            </div>
+			        </div>
+			    </div>
+	            
+	    	</div>  
 	        	        
+    	</div> <!-- /.row -->
+    	
+    	<div class="row text-center">
+	    	<button type="button" class="btn btn-success" id="access-submit">Give Access</button>
     	</div>
-	</div>
+	    	
+	</div> <!-- /.container -->
 
     <div class="container">
 	    
@@ -236,11 +246,6 @@
     
     <script type="text/javascript">
 	    
-	    function logOut() {
-		    ref.unauth();
-		    window.location.href = "/";
-	    }
-	    
 	    $(function () {
         	$('#datetimepicker6').datetimepicker();
 			
@@ -256,8 +261,86 @@
             	$('#datetimepicker6').data("DateTimePicker").maxDate(e.date);
         	});
     	});
+    	
+    	function logOut() {
+		    ref.unauth();
+		    window.location.href = "/";
+	    }
 	    
-		
+	    console.log("lol");
+	    console.log(ref.getAuth().uid);
+	    
+	    var loggedIn;
+	    
+	    ref.child("users/" + ref.getAuth().uid + "/username").once("value", function(snapshot) {
+		    
+		    loggedIn = snapshot.val();
+		    
+		    $("#username").append("Hello, " + loggedIn);
+	    });
+	    
+		$("#access-submit").click(function() {
+			var username = $("#username").val();
+
+			if (username === "") {
+				$("#alert-text").text("Please enter a username");
+				$("#access-alert")
+					.addClass("alert-danger")
+					.removeClass("alert-success")
+					.show();
+				
+			} else {
+				$("#access-alert").hide();
+				var accessNode = ref.child("access/" + username);
+				
+				accessNode.once("value", function(snap) {
+					
+					// check to see if username is valid
+					// https://www.firebase.com/docs/web/api/datasnapshot/exists.html
+					
+					if (!snap.exists()) {
+						$("#alert-text").text("this user does not exist");
+						$("#access-alert")
+							.addClass("alert-danger")
+							.removeClass("alert-success")
+							.show();
+					} else {
+						var userNode = ref.child("users/" +ref.getAuth().uid),
+							transactionsNode = ref.child("transactions"),
+							nodes = [accessNode, userNode]; // [reference to renter, ref to owner]
+						
+						// create unique record of transaction
+						// '.push' returns a unique id after setting
+						// the given values in a node of that
+						// corresponding ID
+						// https://www.firebase.com/docs/web/api/firebase/push.html
+						var trID = transactionsNode.push({
+							owner: loggedIn,
+							user: username,
+							begin: $("#from").val(),
+							end: $("#to").val()
+						}).key();
+					
+						console.log("transaction is ", trID);
+						
+						// attach transaciton id references to corresponding nodes
+						nodes.forEach(function(node) {
+							node.update(trID, function(error) {
+								if (error)
+									console.log(error);		
+							});
+						});	
+						
+						$("#alert-text").text("this user exists");
+						$("#access-alert")
+							.addClass("alert-success")
+							.removeClass("alert-danger")
+							.show();
+						
+					}
+				});				
+			}
+		});
     	
     </script>
 

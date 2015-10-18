@@ -11,3 +11,6 @@ js/**
 # bower stuff
 bower.json
 bower_components
+
+*.jpg
+*.jpeg

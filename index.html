@@ -295,7 +295,6 @@
 					// Keys must be non-empty strings and can't contain ".", "#", "$", "/", "[", or "]"
 	        		var userInfo = {};
 	        		userInfo[userData.uid] = {
-		        		lock: true,
 		        		username: $("#registrationUsername").val(),
 		        		email: $("#registrationEmail").val()
 		        	};
@@ -308,10 +307,8 @@
 	        		
 	        		// Keys must be non-empty strings and can't contain ".", "#", "$", "/", "[", or "]"
 	        		usernames[uname] = {
-		        		locks: ["hahahaha", 1234324]
+		        		locks: [0]
 					};
-					
-					alert(usernames);
 					
 					accessRef.update(usernames, function(error) {
 						if (error) {
