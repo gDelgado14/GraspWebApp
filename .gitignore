@@ -14,3 +14,6 @@ bower_components
 
 *.jpg
 *.jpeg
+
+#node stuff
+node_modules

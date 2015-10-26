@@ -104,16 +104,7 @@
                                 <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
                                 <input id="login-password" type="password" class="form-control" name="password" placeholder="password">
                             </div>
-                                    
-
-                                
-                            <div class="input-group">
-                            	<div class="checkbox">
-                                	<label>
-										<input id="login-remember" type="checkbox" name="remember" value="1"> Remember me
-										</label>
-                            	</div>
-                            </div>
+        
 
 
                                 <div style="margin-top:10px" class="form-group">
@@ -275,6 +266,12 @@
 		
 		function signUp() {
 			
+			var $btn; 
+			
+			$('#btn-signup').click(function () {
+				$btn = $(this).button('loading');
+  			});
+  			
 			var uname = $("#registrationUsername").val();
 			
 			dataRef.createUser({
@@ -286,6 +283,7 @@
 	        		console.log("Error creating user:", error);
 	        		$("#error-text").text(error);
 	        		$('#signUpAlert').show();
+	        		$btn.button('reset');
 	        		
 	      		} else {
 	        		console.log("Successfully created user account with uid:", userData.uid);
@@ -296,11 +294,10 @@
 	        		var userInfo = {};
 	        		userInfo[userData.uid] = {
 		        		username: $("#registrationUsername").val(),
-		        		email: $("#registrationEmail").val()
+		        		email: $("#registrationEmail").val(),
+		        		locks: [0]
 		        	};
 	        		usersRef.update(userInfo);
-	        		
-	        		
 	        		
 	        		var accessRef = dataRef.child("access");
 	        		var usernames = {};
@@ -313,6 +310,7 @@
 					accessRef.update(usernames, function(error) {
 						if (error) {
 							console.log("error with data: ", usernames[$("#registrationUsername").val()]);
+							$btn.button('reset');
 						}
 					});
 					
@@ -324,8 +322,8 @@
 						if (error) {
 							console.log("Error logging in: ", error);
 							$('#signInalert').show();
+							$btn.button('reset');
 	      				} else {
-	        				console.log("Successfully logged in with: ", userData.uid);
 							window.location.href = "/dashboard.html";
 	      				}
 					});
@@ -334,6 +332,12 @@
 		}
 		
 		function logIn() {
+			
+			var $btn; 
+			
+			$('#btn-login').click(function () {
+				$btn = $(this).button('loading');
+  			});
 			
 			var graspEmail = $("#login-email").val();
 			var graspP = $("#login-password").val();
@@ -345,8 +349,8 @@
 				if (error) {
 	        		console.log("Error logging in: ", error);
 	        		$('#signInalert').show();
+	        		$btn.button('reset');
 	      		} else {
-	        		console.log("Successfully logged in with: ", userData.uid);
 	        		window.location.href = "/dashboard.html";
 	      		}
 			});

@@ -29,6 +29,7 @@
 	</script>
     
     <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="js/toastr.min.js"></script>
     
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>
@@ -37,6 +38,7 @@
 	<script type="text/javascript" src="bower_components/moment/min/moment.min.js"></script>
 	<script type="text/javascript" src="bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
 	<link rel="stylesheet" href="css/bootstrap.min.css" />
+	<link rel="stylesheet" href="css/toastr.min.css" />
 	<link rel="stylesheet" href="bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" />
     
     
@@ -118,6 +120,9 @@
                     <li>
                         <a href="#" data-toggle="modal" data-target="#contactModal">Contact</a>
                     </li>
+                    <li>
+                    	<a href="#" id="uname"></a>
+                    </li>
                 </ul>
                 <a href="#" class="btn btn-danger" onclick="logOut()">Log Out</a>
             </div>
@@ -132,12 +137,6 @@
 	    
 	    <div class="row text-center">
 			<h2 id="title">Time Picker</h2>    
-	    </div>
-	    
-	    <div class="row">
-		    <div style="display:none" id="access-alert" class="alert col-sm-4 col-sm-offset-4 text-center">
-			    <p id="alert-text"></p>
-		    </div>
 	    </div>
 	    
     	<div class="row text-center">
@@ -182,6 +181,8 @@
     	<div class="row text-center">
 	    	<button type="button" class="btn btn-success" id="access-submit">Give Access</button>
     	</div>
+    	
+    	<div class="row col-sm-8 col-sm-offset-2" id="table"></div>
 	    	
 	</div> <!-- /.container -->
 
@@ -245,67 +246,54 @@
 
     
     <script type="text/javascript">
-	    
-	    $(function () {
-        	$('#datetimepicker6').datetimepicker();
-			
-			$('#datetimepicker7').datetimepicker({
-            	useCurrent: false //Important! See issue #1075
-        	});
-			
-			$("#datetimepicker6").on("dp.change", function (e) {
-            	$('#datetimepicker7').data("DateTimePicker").minDate(e.date);
-        	});
-			
-			$("#datetimepicker7").on("dp.change", function (e) {
-            	$('#datetimepicker6').data("DateTimePicker").maxDate(e.date);
-        	});
-    	});
     	
     	function logOut() {
 		    ref.unauth();
 		    window.location.href = "/";
 	    }
 	    
-	    console.log("lol");
-	    console.log(ref.getAuth().uid);
-	    
-	    var loggedIn;
-	    
+	    var loggedIn; // keep a record of username to pass this info on transactions
+	   
+	    // append username to navbar
 	    ref.child("users/" + ref.getAuth().uid + "/username").once("value", function(snapshot) {
 		    
 		    loggedIn = snapshot.val();
-		    
-		    $("#username").append("Hello, " + loggedIn);
+		    $("#uname").append("Hello, " + loggedIn);
 	    });
 	    
+	    
 		$("#access-submit").click(function() {
-			var username = $("#username").val();
-
-			if (username === "") {
-				$("#alert-text").text("Please enter a username");
-				$("#access-alert")
-					.addClass("alert-danger")
-					.removeClass("alert-success")
-					.show();
+			var empty = false;
+			
+			$(".form-inline input").each(function() {
+				if ($(this).val() === "") {
+					empty = true;
+					return false;
+				}
+			});
+			
+			if (empty) {
+				
+				// Test Toastr
+				toastr.warning('Please fill in all fields');
 				
 			} else {
-				$("#access-alert").hide();
-				var accessNode = ref.child("access/" + username);
+				var username = $("#username").val();
+				var accessNode = ref.child("access/" + username + "/locks");
 				
+				// if didn't use once (i.e. used .on() 
+				// then immediately updating firebase would
+				// call the function once more
+				// https://www.firebase.com/docs/web/api/query/once.html
 				accessNode.once("value", function(snap) {
 					
 					// check to see if username is valid
 					// https://www.firebase.com/docs/web/api/datasnapshot/exists.html
-					
 					if (!snap.exists()) {
-						$("#alert-text").text("this user does not exist");
-						$("#access-alert")
-							.addClass("alert-danger")
-							.removeClass("alert-success")
-							.show();
+						toastr.error('This user does not exist');
+							
 					} else {
-						var userNode = ref.child("users/" +ref.getAuth().uid),
+						var userNode = ref.child("users/" + ref.getAuth().uid + "/locks"),
 							transactionsNode = ref.child("transactions"),
 							nodes = [accessNode, userNode]; // [reference to renter, ref to owner]
 						
@@ -324,23 +312,80 @@
 						console.log("transaction is ", trID);
 						
 						// attach transaciton id references to corresponding nodes
+						var errors = [];
+						
 						nodes.forEach(function(node) {
-							node.update(trID, function(error) {
-								if (error)
-									console.log(error);		
+							
+							node.once("value", function(snap) {
+								if (snap.val().length === 1 && snap.val()[0] === 0) {
+								    node.set([trID], function(e) {
+								      if(e)
+								        errors.concat(e);
+								    });
+								  } else {
+								  	node.parent().update({locks: snap.val().concat(trID)}, function(e) {
+									  	if (e)
+									  	 errors.concat(e);
+								  	});
+								  }
+								}, function(e) {
+									if (e) 
+								      errors.concat(e);
 							});
-						});	
+						});
 						
-						$("#alert-text").text("this user exists");
-						$("#access-alert")
-							.addClass("alert-success")
-							.removeClass("alert-danger")
-							.show();
-						
+						if (errors.length > 0) {
+							errors.forEach(function(e) {
+								console.log(e);
+								
+							});
+							toastr.error('woops! something went wrong');
+						} else {
+							toastr.success('transaction complete!');
+							
+							$(".form-inline input").each(function() {
+								$(this).val("");
+							});
+						}					
 					}
 				});				
 			}
 		});
+		
+		// required date/time picker lib activator
+		$(function () {
+        	$('#datetimepicker6').datetimepicker();
+			
+			$('#datetimepicker7').datetimepicker({
+            	useCurrent: false //Important! See issue #1075
+        	});
+			
+			$("#datetimepicker6").on("dp.change", function (e) {
+            	$('#datetimepicker7').data("DateTimePicker").minDate(e.date);
+        	});
+			
+			$("#datetimepicker7").on("dp.change", function (e) {
+            	$('#datetimepicker6').data("DateTimePicker").maxDate(e.date);
+        	});
+    	});
+    	
+    	toastr.options = {
+			"closeButton": true,
+			"debug": false,
+			"newestOnTop": false,
+			"progressBar": false,
+			"positionClass": "toast-top-right",
+			"preventDuplicates": false,
+			"onclick": null,
+			"showDuration": "300",
+			"hideDuration": "1000",
+			"timeOut": "5000",
+			"extendedTimeOut": "1000",
+			"showEasing": "swing",
+			"hideEasing": "linear",
+			"showMethod": "fadeIn",
+			"hideMethod": "fadeOut"
+		}
     	
     </script>
 
