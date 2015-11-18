@@ -8,6 +8,8 @@ css/**
 fonts/**
 js/**
 
+testing.js
+
 # bower stuff
 bower.json
 bower_components

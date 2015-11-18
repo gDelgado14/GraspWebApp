@@ -23,7 +23,7 @@
 			console.log("Authenticated user with uid:", authData.uid);
 			console.log("user data", authData);
 		}else {
-    		window.location.href = "/";
+    		window.location.href = "index.html";
 		}
 	</script>
     
@@ -141,7 +141,7 @@
 			</div>
 			
 			<div class="menu col-md-2 text-center">
-				<a href="/access.html">
+				<a href="access.html">
 					<span class="glyphicon glyphicon-time" aria-hidden="true"></span>
 					<h4>Give Access</h4>
 				</a>
@@ -227,7 +227,7 @@
 	    
 	    function logOut() {
 		    ref.unauth();
-		    window.location.href = "/";
+		    window.location.href = "index.html";
 	    }
     </script>
 

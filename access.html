@@ -24,7 +24,7 @@
 			console.log("Authenticated user with uid:", authData.uid);
 			console.log("user data", authData);
 		}else {
-    		window.location.href = "/";
+    		window.location.href = "index.html";
 		}
 	</script>
     
@@ -91,6 +91,9 @@
 			margin-top: 20px;
 		}
 		
+		table {
+			margin-top: 40px;
+		}
     </style>
 	    
 	
@@ -109,7 +112,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="/dashboard.html">Grasp</a>
+                <a class="navbar-brand" href="dashboard.html">Grasp</a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -182,7 +185,7 @@
 	    	<button type="button" class="btn btn-success" id="access-submit">Give Access</button>
     	</div>
     	
-    	<div class="row col-sm-8 col-sm-offset-2" id="table"></div>
+    	<div class="row col-sm-8 col-sm-offset-2" id="table" class="table-responsive"></div>
 	    	
 	</div> <!-- /.container -->
 
@@ -254,12 +257,94 @@
 	    
 	    var loggedIn; // keep a record of username to pass this info on transactions
 	   
-	    // append username to navbar
-	    ref.child("users/" + ref.getAuth().uid + "/username").once("value", function(snapshot) {
+		var useridNode = ref.child("users/" + ref.getAuth().uid),
+			userNode = useridNode.child("locks");
+		
+		var buildTable = function (transactionObj) {
+			
+			var tableDiv = document.getElementById("table").childNodes,
+				table,
+				thead,
+				th,
+				tbody,
+				td,
+				tr;
+			
+			// if table doesn't exist
+			if (tableDiv.length === 0) {
+				// transactionObj.user
+				// transactionObj.begin
+				// transactionObj.end
+				// remove access if date < end
+				
+				table = document.createElement("table");
+				table.className = "table table-striped table-condensed table-hover";
+				thead = document.createElement("thead");
+				tr = document.createElement("tr");
+				
+				for (key in transactionObj) {
+					
+					if (key !== 'owner') {
+						th = document.createElement("th");
+						th.appendChild(document.createTextNode(key));
+						tr.appendChild(th);
+					}
+				}
+				
+				// add 'Remove Access Row'
+				th = document.createElement("th");
+				th.appendChild(document.createTextNode('Remove Access'));
+				tr.appendChild(th);
+				
+				thead.appendChild(tr);
+				table.appendChild(thead);
+				
+				
+				// set up table body with nothing yet inside it
+				tbody = document.createElement("tbody");
+				table.appendChild(tbody);
+			}
+			
+			// once table has been initialized
+			// it will be called once for each
+			// transaction - which will 
+			// constitute a new row on each
+			// invocation
+			tr = document.createElement("tr");
+				
+			for (key in transactionObj) {
+				
+				if (key !== 'owner') {
+					td = document.createElement("td");
+					td.appendChild(document.createTextNode(transactionObj[key]));
+					tr.appendChild(td);
+					tbody.appendChild(tr);
+				}
+			}
+			
+			// finally append table element
+			// to DOM
+			$("#table").append(table);
+		}
+
 		    
+	    // append username to navbar
+		useridNode.child("username").once("value", function(snapshot) {
 		    loggedIn = snapshot.val();
 		    $("#uname").append("Hello, " + loggedIn);
-	    });
+    	});
+    	
+    	
+	    userNode.on("value", function(snap) {
+			if (snap.val()[0] !== 0) {
+				snap.val().forEach(function(trID) { 
+			    	ref.child("transactions/" + trID).once("value", function(snapshot) {
+						buildTable(snapshot.val());
+			      	});
+			    }); 
+			}
+		});
+
 	    
 	    
 		$("#access-submit").click(function() {
@@ -293,8 +378,7 @@
 						toastr.error('This user does not exist');
 							
 					} else {
-						var userNode = ref.child("users/" + ref.getAuth().uid + "/locks"),
-							transactionsNode = ref.child("transactions"),
+						var transactionsNode = ref.child("transactions"),
 							nodes = [accessNode, userNode]; // [reference to renter, ref to owner]
 						
 						// create unique record of transaction
